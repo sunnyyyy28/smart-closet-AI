@@ -1,0 +1,71 @@
+# 「終端機互動介面」草稿
+# 建立系統文字骨架，讓使用者可以通過輸入數字來選擇功能
+
+def main():
+    while True:
+        print("\n" + "="*40)
+        print("💡 救救穿搭黑洞！告別「衣」問三不值得自動化專屬造型系統 💡")
+        print("="*40)
+        print("1. ➕ 新增衣物到衣櫃 (手動標籤)")
+        print("2. ✨ 幫我搭配今日穿搭 (演算法推薦)")
+        print("3. 📊 查看我的衣櫃色彩分析 (圓餅圖)")
+        print("4. ❌ 離開系統")
+        print("-" * 40)
+        
+        choice = input("👉 請輸入數字選擇功能 (1-4): ")
+
+        if choice == '1':
+            add_clothes_ui()
+        elif choice == '2':
+            recommend_outfit_ui()
+        elif choice == '3':
+            show_chart_ui()
+        elif choice == '4':
+            print("👋 感謝使用自動化專屬造型系統，系統已關閉。")
+            break
+        else:
+            print("⚠️ 輸入錯誤！請輸入 1 到 4 的數字喔！")
+
+def add_clothes_ui():
+    print("\n--- [➕ 新增衣物到衣櫃 ➕] ---")
+    # 這裡的分類對應提案報告書裡規劃的標籤
+    print("衣物種類清單：1.上衣 2.下著 3.外套 4.飾品")
+    c_type = input("請輸入種類編號 (1-4): ")
+    
+    color = input("請輸入衣服顏色 (例如：黑、白、紅、藍): ")
+    season = input("請輸入適合季節 (春、夏、秋、冬): ")
+    occasion = input("請輸入適合場合 (休閒、正裝、運動、上學、上班、逛街、旅遊): ")
+    
+    print(f"\n✅ 成功記錄！準備將【{season}季 - {occasion}場合】的【{color}色衣物】存入資料庫...")
+    ## 這裡之後會放宣瑩寫的 SQLite 程式來把資料存進去
+
+def recommend_outfit_ui():
+    print("\n--- [✨ 今日穿搭推薦 ✨] ---")
+    
+    # 天氣資訊的互動
+    use_api = input("需要自動抓取今天的天氣嗎？(輸入 Y 自動抓取，輸入 N 手動輸入氣溫): ").upper()
+    if use_api == 'Y':
+        print("☁️ 正在連線氣象局抓取天氣...")
+        ## 這裡之後會放黃婷寫的天氣 API 程式
+        current_temp = 22 # 假裝 API 回傳了 22 度
+    else:
+        current_temp = input("請手動輸入現在氣溫 (例如: 22): ")
+    
+    # 場合的互動
+    occasion = input("請問今天要去什麼場合？(休閒、正裝、運動、上學、上班、逛街、旅遊): ")
+    
+    print(f"\n⏳ 正在為您計算【氣溫 {current_temp}度】+【{occasion}場合】的最佳穿搭...")
+    ## 這裡之後會放宥綾寫的 If-Else 演算法邏輯
+    
+    # 假裝演算法已經算好結果了，測試若晴負責的視覺顯示
+    print("\n🎉 搭配完成！為您推薦：白色 T恤 + 黑色長褲")
+    ## 這裡之後若晴會加上 Pillow 的程式碼，讓這套衣服的照片在電腦上彈出來
+
+def show_chart_ui():
+    print("\n--- [📊 衣櫃色彩分析 📊] ---")
+    print("正在統計衣櫃中所有衣服的顏色比例...")
+    ## 這裡之後會放惠茗寫的 Matplotlib 圓餅圖程式，並顯示圖片
+
+# 啟動主程式
+if __name__ == "__main__":
+    main()
