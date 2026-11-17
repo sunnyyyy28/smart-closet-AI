@@ -51,7 +51,7 @@ def recommend_outfit_ui():
     else:
         current_temp = input("請手動輸入現在氣溫 (例如: 22): ")
     
-    # 互動場合
+    # 場合的互動
     occasion = input("請問今天要去什麼場合？(休閒、正裝、運動、上學、上班、逛街、旅遊): ")
     
     print(f"\n⏳ 正在為您計算【氣溫 {current_temp}度】+【{occasion}場合】的最佳穿搭...")
