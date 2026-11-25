@@ -57,6 +57,109 @@ def recommend_outfit_ui():
     
     print(f"\n⏳ 正在為您計算【氣溫 {current_temp}度】+【{occasion}場合】的最佳穿搭...")
     ## 這裡之後會放宥綾寫的 If-Else 演算法邏輯
+
+    import random
+
+# 測試用假資料（之後宣瑩 SQLite 寫好，把呼叫處的 MOCK_WARDROBE 換成她的查詢函式即可）
+    MOCK_WARDROBE = [
+        {"id": 1, "type": "上衣", "sub_type": "T恤", "color": "白", "season": "夏", "occasion": "休閒", "img": "white_t.jpg"},
+        {"id": 2, "type": "上衣", "sub_type": "短袖", "color": "藍", "season": "夏", "occasion": "運動", "img": "blue_sport_tee.jpg"},
+        {"id": 3, "type": "上衣", "sub_type": "襯衫", "color": "淺藍", "season": "春", "occasion": "上班", "img": "blue_shirt.jpg"},
+        {"id": 4, "type": "上衣", "sub_type": "打底衫", "color": "黑", "season": "秋", "occasion": "逛街", "img": "black_base.jpg"},
+        {"id": 5, "type": "上衣", "sub_type": "毛衣", "color": "米白", "season": "冬", "occasion": "上學", "img": "cream_sweater.jpg"},
+        {"id": 6, "type": "下著", "sub_type": "短褲", "color": "牛仔藍", "season": "夏", "occasion": "休閒", "img": "denim_shorts.jpg"},
+        {"id": 7, "type": "下著", "sub_type": "短褲", "color": "黑", "season": "夏", "occasion": "運動", "img": "sport_shorts.jpg"},
+        {"id": 8, "type": "下著", "sub_type": "長褲", "color": "黑", "season": "秋", "occasion": "上班", "img": "black_pants.jpg"},
+        {"id": 9, "type": "下著", "sub_type": "長裙", "color": "卡其", "season": "春", "occasion": "逛街", "img": "khaki_skirt.jpg"},
+        {"id": 10, "type": "下著", "sub_type": "長褲", "color": "深灰", "season": "冬", "occasion": "上學", "img": "gray_pants.jpg"},
+        {"id": 11, "type": "外套", "sub_type": "外套", "color": "卡其", "season": "秋", "occasion": "休閒", "img": "khaki_coat.jpg"},
+        {"id": 12, "type": "外套", "sub_type": "外套", "color": "黑", "season": "冬", "occasion": "上班", "img": "black_coat.jpg"},
+    ]
+
+
+    def recommend_outfit(temp, occasion, wardrobe):
+        """
+        依氣溫與場合篩選衣物，回傳推薦組合字典：
+        {"top": dict | None, "bottom": dict | None, "outer": dict | None}
+        """
+        try:
+            temp_val = float(temp)
+        except (ValueError, TypeError):
+            temp_val = 22.0
+
+        occasion_clean = str(occasion).strip()
+
+        if occasion_clean == "運動":
+            if temp_val >= 25:
+                target_seasons = ["夏"]
+                need_outer = False
+            elif temp_val >= 18:
+                target_seasons = ["春", "夏", "秋"]
+                need_outer = False
+            else:
+                target_seasons = ["秋", "冬"]
+                need_outer = True
+        elif occasion_clean in ["正裝", "上班"]:
+            if temp_val >= 28:
+                target_seasons = ["夏", "春"]
+                need_outer = False
+            elif temp_val >= 19:
+                target_seasons = ["春", "秋"]
+                need_outer = True
+             else:
+                target_seasons = ["冬", "秋"]
+                need_outer = True
+        else:
+            if temp_val >= 27:
+                target_seasons = ["夏"]
+                need_outer = False
+            elif temp_val >= 21:
+                target_seasons = ["春", "夏"]
+                need_outer = False
+            elif temp_val >= 16:
+                target_seasons = ["秋", "春"]
+                need_outer = True
+            else:
+                target_seasons = ["冬", "秋"]
+                need_outer = True
+
+        def pick_by_type(item_type):
+            matched = [
+                item for item in wardrobe
+                if item.get("type") == item_type
+                and item.get("season") in target_seasons
+                and item.get("occasion") == occasion_clean
+            ]
+            if not matched:
+                matched = [
+                    item for item in wardrobe
+                    if item.get("type") == item_type
+                    and item.get("season") in target_seasons
+                ]
+            if not matched:
+                matched = [item for item in wardrobe if item.get("type") == item_type]
+
+            return random.choice(matched) if matched else None
+
+        return {
+            "top": pick_by_type("上衣"),
+            "bottom": pick_by_type("下著"),
+            "outer": pick_by_type("外套") if need_outer else None,
+        }
+
+
+    def format_outfit_summary(result):
+        parts = []
+        for key, label in [("top", "上衣"), ("bottom", "下著"), ("outer", "外套")]:
+            item = result.get(key)
+            if item:
+                parts.append(f"{item.get('color', '')}色{item.get('sub_type', '')}")
+            elif key != "outer":
+                parts.append(f"無合適{label}")
+        return " + ".join(parts)
+
+
+
     
     # 假裝演算法已經算好結果了，測試若晴的視覺顯示
     print("\n🎉 搭配完成！為您推薦：白色 T恤 + 黑色長褲")
