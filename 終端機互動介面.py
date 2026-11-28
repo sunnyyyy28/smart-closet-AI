@@ -1,19 +1,10 @@
 import random
-
-MOCK_WARDROBE = [
-    {"id": 1, "type": "上衣", "sub_type": "T恤", "color": "白", "season": "夏", "occasion": "休閒", "img": "white_t.jpg"},
-    {"id": 2, "type": "上衣", "sub_type": "短袖", "color": "藍", "season": "夏", "occasion": "運動", "img": "blue_sport_tee.jpg"},
-    {"id": 3, "type": "上衣", "sub_type": "襯衫", "color": "淺藍", "season": "春", "occasion": "上班", "img": "blue_shirt.jpg"},
-    {"id": 4, "type": "上衣", "sub_type": "打底衫", "color": "黑", "season": "秋", "occasion": "逛街", "img": "black_base.jpg"},
-    {"id": 5, "type": "上衣", "sub_type": "毛衣", "color": "米白", "season": "冬", "occasion": "上學", "img": "cream_sweater.jpg"},
-    {"id": 6, "type": "下著", "sub_type": "短褲", "color": "牛仔藍", "season": "夏", "occasion": "休閒", "img": "denim_shorts.jpg"},
-    {"id": 7, "type": "下著", "sub_type": "短褲", "color": "黑", "season": "夏", "occasion": "運動", "img": "sport_shorts.jpg"},
-    {"id": 8, "type": "下著", "sub_type": "長褲", "color": "黑", "season": "秋", "occasion": "上班", "img": "black_pants.jpg"},
-    {"id": 9, "type": "下著", "sub_type": "長裙", "color": "卡其", "season": "春", "occasion": "逛街", "img": "khaki_skirt.jpg"},
-    {"id": 10, "type": "下著", "sub_type": "長褲", "color": "深灰", "season": "冬", "occasion": "上學", "img": "gray_pants.jpg"},
-    {"id": 11, "type": "外套", "sub_type": "外套", "color": "卡其", "season": "秋", "occasion": "休閒", "img": "khaki_coat.jpg"},
-    {"id": 12, "type": "外套", "sub_type": "外套", "color": "黑", "season": "冬", "occasion": "上班", "img": "black_coat.jpg"},
-]
+from database import (
+    init_db,
+    add_cloth_item,
+    get_all_clothes,
+    get_color_counts,
+)
 
 
 def recommend_outfit(temp, occasion, wardrobe):
@@ -99,6 +90,8 @@ def format_outfit_summary(result):
 
 
 def main():
+    init_db(seed_if_empty=True)
+
     while True:
         print("\n" + "=" * 50)
         print("💡 救救穿搭黑洞！告別「衣」問三不知的自動化專屬造型系統 💡")
@@ -133,8 +126,10 @@ def add_clothes_ui():
     color = input("請輸入衣物顏色 (例如：黑、白、紅、藍): ").strip()
     season = input("請輸入適合季節 (春、夏、秋、冬): ").strip()
     occasion = input("請輸入適合場合 (休閒、正裝、運動、上學、上班、逛街、旅遊): ").strip()
+    img = input("請輸入圖片檔名（可先留空直接按 Enter）: ").strip()
 
-    print(f"\n✅ 成功記錄！準備將【{season}季 - {occasion}場合】的【{color}色{clothes}（類別代號：{c_type}）】存入資料庫...")
+    new_id = add_cloth_item(c_type, clothes, color, season, occasion, img)
+    print(f"\n✅ 已存入資料庫（編號 #{new_id}）：【{season}季 - {occasion}場合】的【{color}色{clothes}】")
 
 
 def recommend_outfit_ui():
@@ -143,7 +138,7 @@ def recommend_outfit_ui():
     use_api = input("需要自動抓取今天的天氣嗎？(輸入 Y 自動抓取，輸入 N 手動輸入氣溫): ").strip().upper()
     if use_api == "Y":
         print("☁️ 正在連線氣象局抓取天氣...")
-        current_temp = 22  # 假裝 API 回傳了 22 度
+        current_temp = 22
     else:
         current_temp = input("請手動輸入現在氣溫 (例如: 22): ").strip()
 
@@ -151,7 +146,8 @@ def recommend_outfit_ui():
 
     print(f"\n⏳ 正在為您計算【氣溫 {current_temp}度】+【{occasion}場合】的最佳穿搭...")
 
-    result = recommend_outfit(current_temp, occasion, MOCK_WARDROBE)
+    wardrobe = get_all_clothes()
+    result = recommend_outfit(current_temp, occasion, wardrobe)
     summary = format_outfit_summary(result)
 
     print(f"\n🎉 搭配完成！為您推薦：{summary}")
@@ -159,7 +155,16 @@ def recommend_outfit_ui():
 
 def show_chart_ui():
     print("\n--- [📊 衣櫃色彩分析 📊] ---")
-    print("正在統計衣櫃中所有衣服的顏色比例...")
+    counts = get_color_counts()
+    if not counts:
+        print("目前衣櫃裡還沒有衣物喔！")
+        return
+
+    total = sum(counts.values())
+    print(f"目前衣櫃共有 {total} 件衣物，顏色分布如下：")
+    for color, cnt in counts.items():
+        pct = (cnt / total) * 100
+        print(f"  - {color}色：{cnt} 件 ({pct:.1f}%)")
 
 
 if __name__ == "__main__":
